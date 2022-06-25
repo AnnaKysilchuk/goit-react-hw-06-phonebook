@@ -1,7 +1,11 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux/es/exports';
+import { changeFilter } from '../../redux/contacts/contactsSlice';
 import style from './FilterForm.module.css';
 
-export const FilterForm = ({ value, onChange }) => {
+export const FilterForm = () => {
+    const filter = useSelector(state => state.filter);
+    const dispatch = useDispatch();
+
     return (
         <div>
             <label>
@@ -12,15 +16,10 @@ export const FilterForm = ({ value, onChange }) => {
                     pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
                     required
                     className={style.filterInputArea}
-                    value={value}
-                    onChange={onChange}
+                    value={filter}
+                    onChange={e => dispatch(changeFilter(e.target.value))}
                 />
             </label>
         </div>
     );
-};
-
-FilterForm.propTypes = {
-    value: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
 };

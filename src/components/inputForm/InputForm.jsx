@@ -1,28 +1,36 @@
-import PropTypes from 'prop-types';
 import { useState } from 'react';
-import style from './InputForm.module.css';
+import { useSelector, useDispatch } from 'react-redux/es/exports';
 import { nanoid } from 'nanoid';
+import { addContacts, getContact } from '../../redux/contacts/contactsSlice';
+import style from './InputForm.module.css';
 
-export const InputForm = ({ onSubmit }) => {
+export const InputForm = () => {
     const [name, setName] = useState('');
     const [number, setNumber] = useState('');
+    const dispatch = useDispatch();
+    const contacts = useSelector(getContact);
 
-    const nameInputId = nanoid();
-    const numberInputId = nanoid();
+    const onAddContact = contact => {
+        if (contacts && contacts.flatMap(item => item.name).includes(contact.name)) {
+            alert(`${contact.name} is already in your contacts.`);
+            return;
+        }
+        const addContact = contact => dispatch(addContacts(contact));
+        addContact(contact);
+    };
 
     const handleSubmit = event => {
         event.preventDefault();
-        onSubmit({
+        onAddContact({
             name: name,
             number: number,
             id: nanoid(),
         });
-
         reset();
     };
 
     const handleChange = event => {
-        const { name, value } = event.currentTarget;
+        const { name, value } = event.target;
         if (name === 'name') {
             setName(value);
         }
@@ -38,7 +46,7 @@ export const InputForm = ({ onSubmit }) => {
 
     return (
         <form className={style.inputForm} onSubmit={handleSubmit}>
-            <label className={style.label} htmlFor={nameInputId}>
+            <label className={style.label}>
                 Name
                 <br />
                 <input
@@ -49,11 +57,10 @@ export const InputForm = ({ onSubmit }) => {
                     required
                     className={style.inputArea}
                     value={name}
-                    id={nameInputId}
                     onChange={handleChange}
                 />
             </label>
-            <label className={style.label} htmlFor={numberInputId}>
+            <label className={style.label}>
                 Number
                 <br />
                 <input
@@ -64,7 +71,6 @@ export const InputForm = ({ onSubmit }) => {
                     required
                     className={style.inputArea}
                     value={number}
-                    id={numberInputId}
                     onChange={handleChange}
                 />
             </label>
@@ -73,8 +79,4 @@ export const InputForm = ({ onSubmit }) => {
             </button>
         </form>
     );
-};
-
-InputForm.propTypes = {
-    onSubmit: PropTypes.func.isRequired,
 };
